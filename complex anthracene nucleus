@@ -1,0 +1,45 @@
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
+from rdkit.Chem import Descriptors
+
+# Step 1: Define the SMILES for the molecule
+# Phenanthrene with side chain containing benzofuran, 4 carboxylic acids, 3 amines, and 2 fluorines
+smiles = "c1ccc2c(c1)c3ccccc3c2CCCC(F)(F)C(C(=O)O)(C(=O)O)C(N)C(N)C(N)c4occc4"
+
+# Step 2: Convert SMILES to RDKit molecule object
+molecule = Chem.MolFromSmiles(smiles)
+
+# Step 3: Verify molecule generation
+if molecule is None:
+    raise ValueError("Invalid SMILES string! Please check the structure.")
+
+# Step 4: Visualize the molecule
+# Save and display the image for better molecule verification
+Draw.MolToFile(molecule, "molecule_structure.png")
+print("Molecule structure saved as 'molecule_structure.png'.")
+
+# Step 5: Compute Morgan Fingerprint (Circular fingerprint with radius 2)
+fingerprint = GetMorganFingerprintAsBitVect(molecule, radius=2, nBits=2048)
+
+# Step 6: Convert fingerprint to a human-readable format
+fingerprint_binary = list(fingerprint)  # List of 0s and 1s
+fingerprint_hex = fingerprint.ToBitString()  # Binary as a long string
+
+# Step 7: Calculate key molecular properties
+mol_weight = Descriptors.MolWt(molecule)  # Molecular weight
+logp = Descriptors.MolLogP(molecule)  # Octanol-water partition coefficient
+h_donors = Descriptors.NumHDonors(molecule)  # Number of hydrogen bond donors
+h_acceptors = Descriptors.NumHAcceptors(molecule)  # Number of hydrogen bond acceptors
+
+# Step 8: Display results
+print("\n--- Molecular Fingerprint ---")
+print(f"Binary List (First 20 bits): {fingerprint_binary[:20]} ...")
+print(f"Hexadecimal String: {fingerprint_hex[:40]} ...")
+
+print("\n--- Molecular Properties ---")
+print(f"Molecular Weight: {mol_weight:.2f}")
+print(f"LogP: {logp:.2f}")
+print(f"H-bond Donors: {h_donors}")
+print(f"H-bond Acceptors: {h_acceptors}")
+
